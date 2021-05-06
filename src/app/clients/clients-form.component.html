@@ -1,0 +1,250 @@
+<span>
+<responseMessage></responseMessage>
+<h3>{{ title }}</h3>
+    <form  #clientForm="ngForm" (ngSubmit)="addUpdateClient()" class="form-horizontal">
+        <fieldset>
+            <fieldset class="header-fieldset">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Client Code</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="client.clientCode" id="clientCode" #clientCode="ngModel" 
+                        name="clientCode" required maxlength="30" placeholder="1-30 Character" type="text" 
+                        size="10" class="form-control col-xs-4">
+                         <div *ngIf="clientCode.errors && (clientCode.dirty || clientCode.touched)" class="error-block-custom">
+                           <div [hidden]="!clientCode.errors.required">
+                               Client Code is required
+                           </div>
+                          <div [hidden]="!clientCode.errors.maxlength">
+                               Client Code should not be 30 characters.
+                          </div>
+                         </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                        {{client.clientCode}}
+                    </div>  
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Client Secret</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="client.clientSecret" #clientSecret="ngModel" required name="clientSecret" type="text" size="20" class="form-control col-xs-4">
+                        <div *ngIf="clientSecret.errors && (clientSecret.dirty || clientSecret.touched)" class="error-block-custom">
+                           <div [hidden]="!clientSecret.errors.required">
+                               Client Secret is required
+                           </div>
+                         </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{client.clientSecret}}
+                    </div> 
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Client Enabled</label>
+                     <div *ngIf="isEditable">
+                     <div class="checkbox">
+                         <label style="padding-left: 4%;">
+                            <input [(ngModel)]="client.enabled" #enabled="ngModel" name="enabled" type="checkbox" class="">
+                         </label>
+                     </div>
+                     </div>
+                     <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{client.enabled}}
+                     </div>
+                </div>
+                <div class="form-group" *ngIf="isNew">
+                    <label class="control-label col-sm-2">Default Token Life</label>
+                     <div >
+                     <div class="checkbox">
+                         <label style="padding-left: 4%;" >
+                            <input  type="checkbox"   (change)="setDefTokenLife(cv.checked)"  #cv [checked]=false>
+                         </label>
+                     </div>
+                     </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Token Life</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [disabled]="defTokenLifeFlag" [(ngModel)]="client.tokenLife" name="tokenLife" #tokenLife="ngModel" type="text" size="5" class="form-control col-xs-4">
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{client.tokenLife}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Components-Uri</label>
+                    <div class="Control-left-label col-sm-2" style="width:50%">
+                            <ul style="list-style-type:none; padding-left:1px " *ngFor="let comp of compList ; let index =index">
+                                <li><a class="a-custom" *ngIf="isEditable" data-toggle="modal" data-target="#clientCompModal" (click)="viewCompURI(comp,index)">{{comp.name}}</a>
+                                <a *ngIf="!isEditable" (click)="navigateToComp(comp)" class="a-custom" >{{comp.name}}</a>
+                                <i *ngIf="isEditable" title="Remove component"  style="display: inline; color: red;padding-left:2px" class="glyphicon glyphicon-trash clickable" (click)="deleteCompURI(comp)"></i>
+                                </li>
+                            </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2"></label>
+                        <div class="col-sm-10" *ngIf="isEditable">
+                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#clientCompModal" (click)="addCompURI()">Add Component Uri</button>
+                        </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Client Address/Net Mask</label>
+                    <div class="control-left-label col-sm-2" style="width:50%">
+                            <ul style="list-style-type:none; padding-left:1px " *ngFor="let comp of clientAddressList ; let index =index">
+                                <li><a class="a-custom" *ngIf="isEditable" data-toggle="modal" data-target="#clientAddModal" (click)="viewClientAdddress(comp,index)" >{{comp.ipAddress}}/{{comp.netMask}}</a>
+                               <label *ngIf="!isEditable">{{comp.ipAddress}}/{{comp.netMask}}</label>
+                                <i *ngIf="isEditable" title="Remove Address"  style="display: inline; color: red;padding-left:2px" class="glyphicon glyphicon-trash clickable" (click)="deleteClientAddress(comp)"></i></li>
+                            </ul>
+                    </div>      
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2"></label>
+                        <div class="col-sm-10" *ngIf="isEditable">
+                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#clientAddModal" (click)="addClientAddress()">Add Client-Address</button>
+                        </div>
+                </div>
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created By</label>
+                    <label class="control-label col-sm-2" style="text-align:left"> {{client.createdBy}}</label>                      
+                </div>
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created On</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{client.createdTime}}</label>                    
+                </div>
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated By</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{client.updatedBy}} </label>                     
+                </div>
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated On</label>   
+                    <label class="control-label col-sm-2" style="text-align:left"> {{client.updatedTime}}</label>                  
+                </div>
+            </fieldset>
+            <br>
+            <fieldset class="footer-fieldset">
+             <button  type="submit" [disabled]="!clientForm.form.valid" *ngIf="isUpdate" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="fa fa-floppy-o"></span>&nbsp;Save
+             </button>
+             <button  type="button" *ngIf="isUpdate" class="btn btn-primary"  (click)="resetForm()">
+                <span class="fa fa-undo"></span>&nbsp;Reset
+             </button>
+             <button  type="submit" [disabled]="!clientForm.form.valid" *ngIf="isNew" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Create
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" style="margin-left:16.66%" (click)="editClient()">
+                <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" (click)="removeClient()">
+                <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+             </button>
+             <dialog-message (onConfirm)="onConfirm($event)"></dialog-message>
+            </fieldset>
+      </fieldset>
+   </form>
+<spinner [visible]="pageLoading"></spinner>
+
+<!-- Modal for Client Addess Process Starts -->
+<div id="clientAddModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header modal-header-custom">
+				<button type="button" style="color: white" class="close" data-dismiss="modal"><b>&times;</b></button>
+				<h4 class="modal-title"><b>Add Client Address</b></h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='myForm' role="form" #clientAddForm="ngForm">
+					<div class="form-group">
+						<label class="control-label col-sm-3">Ip Address</label>
+						<div class="col-sm-7">
+							<input type="text" [(ngModel)]='clientAddress.ipAddress' required #ipAddress="ngModel" name="ipAddress" class="form-control" >
+							 <div *ngIf="ipAddress.errors && (ipAddress.dirty || ipAddress.touched)" class="alert alert-danger">
+                              <div [hidden]="!ipAddress.errors.required">
+                                 IpAddress is required
+                              </div>
+                             </div> 
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3">Net Mask</label>
+						<div class="col-sm-7">
+							<input type="text" [(ngModel)]='clientAddress.netMask' required #netMask="ngModel" name="netMask" class="form-control" >
+							  <div *ngIf="netMask.errors && (netMask.dirty || netMask.touched)" class="alert alert-danger">
+                               <div [hidden]="!netMask.errors.required">
+                                 NetMask is required
+                               </div>
+                             </div> 
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button *ngIf="isEditable && !isAddressUpdt" type="button"
+					[disabled]='!clientAddForm.valid' (click)="saveClientAddress(clientAddress)" data-dismiss="modal"
+					class="btn btn-success">Create</button>
+				<button *ngIf="isEditable && isAddressUpdt" type="button"
+					[disabled]='!clientAddForm.valid' (click)="updateClientAddress(clientAddress)" data-dismiss="modal"
+					class="btn btn-success">Update</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for Client Addess Process Ends -->
+<!-- Modal for Client Components Process Starts -->
+<div id="clientCompModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header modal-header-custom">
+				<button type="button" style="color: white" class="close" data-dismiss="modal"><b>&times;</b></button>
+				<h4 class="modal-title"><b>Add Component URI</b></h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='myForm' role="form" #clientCompFrom="ngForm">
+					<div class="form-group">
+						<label class="control-label col-sm-4">Component</label>
+						<div class="col-sm-7">
+							<select *ngIf="isEditable && !isCompUpdt" class="form-control" (change)="setSelectedComp($event.target.value)">
+								<option value="0">Select Component</option>
+								<option [ngValue]="component" *ngFor="let component of componentListNA ">{{component.name}}</option>
+							</select>
+                            <label *ngIf="isEditable && isCompUpdt" class="control-label">{{selectedComp.name}}</label>
+						</div>
+					</div>
+					<div *ngIf="isCompUpdt" class="form-group">
+						<label class="control-label col-sm-4">Assigned Uri</label>
+						<div class="col-sm-7">
+							<ul style="list-style-type: none; padding-left: 1px">
+								<li *ngFor="let uri of addedUri ; let index =index"><label class="control-left-label" style="word-wrap:break-word;">{{uri.uri}}</label>
+								<i title="Remove Component URI" style="display: inline; color: red; padding-left: 2px" class="glyphicon glyphicon-trash clickable" (click)="deleteURI(index)"></i></li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-4">Non Assigned Uri</label>
+						<div class="col-sm-7">
+							<select multiple="multiple" class="form-control" (change)="setSelectedURI($event.target)">
+								<option [ngValue]="uriObj" [title]="uriObj.uri" *ngFor="let uriObj of selectedComp.uris ">{{uriObj.uri}}</option>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button *ngIf="isEditable && !isCompUpdt" type="button" [disabled]='!clientCompFrom.valid' (click)="saveCompURI()"
+					data-dismiss="modal" class="btn btn-success">Create</button>
+				<button *ngIf="isEditable && isCompUpdt" type="button" (click)="updateCompURI()"
+					data-dismiss="modal" class="btn btn-success">Update</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for Client Components Process Ends -->
+
+</span>

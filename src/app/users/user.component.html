@@ -1,0 +1,59 @@
+<span>
+  <responseMessage [visible]="displayMsg" [messageType]="messageType" [message] = "message"></responseMessage>
+  <span style="padding-right: 20px;"><h3 style="display:inline">Users</h3></span >
+  <span ><button class="btn btn-primary" (click)="addNewUser()"><span class="fa fa-user-plus" aria-hidden="true"></span>&nbsp;New
+User</button>
+	<span style="align:right">
+	  <span class="input-group pull-right">
+        <input class="form-control" placeholder="Search" type="search" [(ngModel)] = "seachCriteria" style="width:200px"/>
+      			  <span class="glyphicon glyphicon-search form-control-feedback"></span>
+	  </span>
+	</span>
+</span>
+<div class="margin-top-1 table-responsive" *ngIf="anyUser">
+	<br/>
+	<div class="form-group">
+	   <div class="col-md-7">
+         <label class="control-label">Rows on page</label> 
+		   <select class="row-on-pages" [(ngModel)]="rowsOnPage">
+             <option [ngValue]="10">10</option>
+             <option [ngValue]="15">15</option>
+             <option [ngValue]="20">20</option>
+           </select>
+	   </div>
+	</div>
+	<table class="table table-bordered" [mfData]="users" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage">
+		<thead>
+			<tr>
+				<th class="header-cell">
+					<mfDefaultSorter by="userId">User Id</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="userName">User Name</mfDefaultSorter>
+				</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<div *ngIf="(mf.data | userSearchFilters : seachCriteria).length===0" >
+				No Result Found
+			</div>
+			<tr *ngFor="let users of mf.data | userSearchFilters : seachCriteria : {userResult : users} ;  let index =index;let  isOdd=odd;let isEven=even"
+				[class.odd]="isOdd" [class.even]="isEven" [class.selected]="users.userId===selectUserId" (click)="updateUser(users)"
+				(mouseover)='over(users)' (mouseout)=tableMouseOut()>
+				<td class="data-cell">{{ users.userId }}</td>
+				<td class="data-cell">{{ users.userName }}</td>
+
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="6" align="right">
+					<mfBootstrapPaginator></mfBootstrapPaginator>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+<spinner [visible]="pageLoading"></spinner>
+</span>

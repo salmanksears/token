@@ -1,0 +1,35 @@
+<nav class="navbar navbar-default navbar-height-mod">
+    <div class="container-fluid">
+        <div class="navbar-header width-max">
+            <ul class="nav navbar-nav width-max">
+                <li class="nav navbar-nav navbar-left">
+                    <img style="padding: 6px 0px !important;" 
+                        src="assets/images/shlogo.gif" alt="...">
+                </li>
+                <li class="nav navbar-nav active" style="padding: 6px 130px !important;">
+                    <span style="color:white; font-size: 25px;">Maintenance Panel</span>
+                    <br/>
+                    <span style="padding: 90px; color:white; font-size: 12px;">{{ applicationType }}</span>
+                </li>
+                <li class="nav navbar-nav navbar-right" *ngIf="showLoggedInUserDetails">
+                    <div class="logged-in-user-header">
+                        <div class="logged-in-user-header-header" (mouseover) = "expanded()" (click) = "toggle()">
+                            {{ displayName }}
+                            <i class="glyphicon logged-in-user-header-chevron"
+                             [ngClass]="{
+                                    'glyphicon-chevron-down': isCollapsed,
+                                    'glyphicon-chevron-up': !isCollapsed 
+                            }">
+                          </i>
+                    </div>
+                    <div class="logged-in-user-header-body" *ngIf="!isCollapsed" 
+                            (mouseover) = "expanded()"
+                            (click) = "collapsed()">
+                            <span (click)="logout()">Logout <i class="fa fa-power-off" aria-hidden="true" style="padding-left: 74px;"></i></span>
+                     </div>
+                     </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,64 @@
+<span>
+  <responseMessage [visible]="displayMsg" [messageType]="messageType" [message] = "message"></responseMessage>
+  <span style="padding-right: 20px;"><h3 style="display:inline">Components</h3></span >
+  <span ><button class="btn btn-primary" (click)="addNewComponent()"><span class="fa fa-cloud"></span>&nbsp;New
+Components</button>
+	<span style="align:right">
+	  <span class="input-group pull-right">
+        <input class="form-control" placeholder="Search" type="search" [(ngModel)] = "seachCriteria" style="width:200px"/>
+      			  <span class="glyphicon glyphicon-search form-control-feedback"></span>
+	  </span>
+	</span>
+</span>
+<div class="margin-top-1 table-responsive" *ngIf="anyComponent">
+	
+	<br/>
+	<div class="form-group">
+	   <div class="col-md-7">
+         <label class="control-label">Rows on page</label> 
+		   <select class="row-on-pages" [(ngModel)]="rowsOnPage">
+             <option [ngValue]="10">10</option>
+             <option [ngValue]="15">15</option>
+             <option [ngValue]="20">20</option>
+           </select>
+	   </div>
+	</div>
+	<table class="table table-bordered" [mfData]="components" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage">
+		<thead>
+			<tr>
+				<th class="header-cell">
+					<mfDefaultSorter by="compId">Component Id</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="name">Component Name</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="sessionLife">Session Life</mfDefaultSorter>
+				</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<div *ngIf="(mf.data | compSearchFilters : seachCriteria).length===0" >
+				No Result Found
+			</div>
+			<tr *ngFor="let component of mf.data | compSearchFilters : seachCriteria  : { compResult : components};  let index =index;let  isOdd=odd;let isEven=even"
+				[class.odd]="isOdd" [class.even]="isEven" [class.selected]="component.compId===selectComponentId" (click)="updateComponent(component)"
+				(mouseover)='over(component)' (mouseout)=tableMouseOut()>
+				<td class="data-cell">{{ component.compId }}</td>
+				<td class="data-cell">{{ component.name }}</td>
+				<td class="data-cell">{{ component.sessionLife }}</td>
+
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="7" align="right">
+					<mfBootstrapPaginator></mfBootstrapPaginator>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+<spinner [visible]="pageLoading"></spinner>
+</span>

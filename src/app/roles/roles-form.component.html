@@ -1,0 +1,67 @@
+<span>
+<responseMessage></responseMessage>
+<h3>{{ title }}</h3>
+        <form #rolesForm="ngForm" (ngSubmit)="updateRole()" class="form-horizontal">
+           <fieldset>
+            <fieldset class="header-fieldset">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Authority</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="role.authority" #authority="ngModel" required name="authority" type="text" size="10" class="form-control col-xs-4">
+                        <div *ngIf="authority.errors && (authority.dirty || authority.touched)" class="error-block-custom">
+                         <div [hidden]="!authority.errors.required">
+                           Authority is required
+                         </div>
+                        </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                        {{role.authority}}
+                    </div>  
+                </div> 
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created By</label>
+                    <label class="control-label col-sm-2" style="text-align:left"> {{role.createdBy}}</label>                      
+                 </div>
+                  <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created On</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{role.createdTime}}</label>                    
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated By</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{role.updatedBy}} </label> 
+                                      
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated On</label>   
+                    <label class="control-label col-sm-2" style="text-align:left"> {{role.updatedTime}}</label>                  
+                 </div>
+
+            </fieldset>
+            <br>
+            <fieldset class="footer-fieldset">
+             <button [disabled]="!rolesForm.valid" type="submit" *ngIf="isUpdate" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="fa fa-floppy-o"></span>&nbsp;Save
+             </button>
+             <button  type="button" *ngIf="isUpdate" class="btn btn-primary"  (click)="resetForm()">
+                <span class="fa fa-undo"></span>&nbsp;Reset
+             </button>
+             <button [disabled]="!rolesForm.valid" type="submit" *ngIf="isNew" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Create
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" style="margin-left:16.66%" (click)="editRole()">
+                <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" (click)="removeRole()">
+                <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+             </button>
+         
+             <dialog-message (onConfirm)="onConfirm($event)"></dialog-message>
+            </fieldset>
+           </fieldset>
+        </form>
+    <spinner [visible]="pageLoading"></spinner>
+</span>

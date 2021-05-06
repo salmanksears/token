@@ -1,0 +1,141 @@
+<span>
+<responseMessage></responseMessage>
+<h3>{{ title }}</h3>
+        <form  #componentForm="ngForm" (ngSubmit)="updateComponent()" class="form-horizontal">
+            <fieldset>
+            <fieldset class="header-fieldset">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Component Name</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="components.name" #name="ngModel" required name="name" type="text" size="10" class="form-control col-xs-4">
+                         <div *ngIf="name.errors && (name.dirty || name.touched)" class="error-block-custom">
+                            <div [hidden]="!name.errors.required">
+                                 ComponentName required
+                            </div>
+                         </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                        {{components.name}}
+                    </div>  
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Session Life</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="components.sessionLife" required #sessionLife="ngModel" name="sessionLife" type="text" size="20" class="form-control col-xs-4">
+                         <div *ngIf="sessionLife.errors && (sessionLife.dirty || sessionLife.touched)" class="error-block-custom">
+                            <div [hidden]="!sessionLife.errors.required">
+                                 SessionLife value is required
+                            </div>
+                         </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{components.sessionLife}}
+                    </div> 
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">Component URI/[Role]</label>
+                    <div class="Control-left-label col-sm-2" style="width:50%">
+                            <ul style="list-style-type:none; padding-left:1px " *ngFor="let compUri of componentUrlList ; let index =index">
+                                <li><a class="a-custom" *ngIf="isEditable" data-toggle="modal" data-target="#myModal" (click)="updateCompUri(compUri,index)" >{{compUri.uri}}/[{{compUri.role.authority}}]</a>
+                               <label *ngIf="!isEditable">{{compUri.uri}}/[{{compUri.role.authority}}]</label>
+                                <i *ngIf="isEditable" title="Remove component"  style="display: inline; color: red;padding-left:2px" class="glyphicon glyphicon-trash clickable" (click)="deleteCompUri(compUri)"></i></li>
+                            </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2"></label>
+                        <div class="col-sm-10" *ngIf="isEditable">
+                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" (click)="createNewCompUri()">Add Component URI</button>
+                        </div>
+                </div>
+                <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created By</label>
+                    <label class="control-label col-sm-2" style="text-align:left"> {{components.createdBy}}</label>                      
+                 </div>
+                  <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created On</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{components.createdTime}}</label>                    
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated By</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{components.updatedBy}} </label> 
+                                      
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated On</label>   
+                    <label class="control-label col-sm-2" style="text-align:left"> {{components.updatedTime}}</label>                  
+                 </div>
+            </fieldset>
+            <br>
+            <fieldset class="footer-fieldset">
+             <button [disabled]="!componentForm.valid" type="submit" *ngIf="isUpdate" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="fa fa-floppy-o"></span>&nbsp;Save
+             </button>
+             <button  type="button" *ngIf="isUpdate" class="btn btn-primary"  (click)="resetForm()">
+                <span class="fa fa-undo"></span>&nbsp;Reset
+             </button>
+             <button [disabled]="!componentForm.valid" type="submit" *ngIf="isNew" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Create
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable && showUpdate" style="margin-left:16.66%" (click)="editComponent()">
+                <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable && showUpdate" (click)="removeComponent()">
+                <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+             </button>
+         
+             <dialog-message (onConfirm)="onConfirm($event)"></dialog-message>
+            </fieldset>
+            </fieldset>
+        </form>
+    <spinner [visible]="pageLoading"></spinner>
+
+    <!-- Modal -->
+<div id="myModal"  class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header modal-header-custom">
+        <button type="button" style="color:white" class="close" data-dismiss="modal"><b>&times;</b></button>
+        <h4 class="modal-title"><b>Component URI/Role</b></h4>
+              </div>
+      <div class="modal-body">
+        <form class="form-horizontal" id='myForm' #compUriForm="ngForm">
+          <div class="form-group">
+              <label class="control-label col-sm-4">Component URI</label>
+                <div class="col-sm-7">
+                    <input  type="text" [(ngModel)]="compUri.uri" required #uri=ngModel name="uri" class="form-control">
+                      <div *ngIf="uri.errors && (uri.dirty || uri.touched)" class="error-block-custom">
+                        <div [hidden]="!uri.errors.required">
+                          Component URI is required
+                        </div>
+                      </div> 
+                </div>
+          </div>
+          <div class="form-group">
+              <label class="control-label col-sm-4">Role Component</label>
+                <div class="col-sm-7">
+                    <select class="form-control" (change)="onChangeRole($event.target.value)" >
+                            <option value="0"  selected="{{('default' === selectedRoles.authority) ? 'selected' : ''}}">Select Role</option>
+                            <option [ngValue]="role" *ngFor="let role of roleList " selected="{{(role.authority === selectedRoles.authority) ? 'selected' : ''}}">{{role.authority}}</option>
+                    </select>
+                </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="isEditable && !isCompUriUpdt" type="button" [disabled]='!compUriForm.valid' (click)="addCompUri(compUri)"data-dismiss="modal" class="btn btn-success">Create</button>
+        <button *ngIf="isEditable && isCompUriUpdt" type="button" [disabled]='!compUriForm.valid' (click)="updateExistCompUri(compUri)" data-dismiss="modal" class="btn btn-success">Update</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</span>
