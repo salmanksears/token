@@ -1,0 +1,145 @@
+<span>
+<responseMessage></responseMessage>
+<h3>{{ title }}</h3>
+        <form #userForm="ngForm" (ngSubmit)="updateUser()" class="form-horizontal">
+            <fieldset>
+            <fieldset class="header-fieldset">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">UserName</label>
+                    <div class="col-sm-10">
+                    <div *ngIf="isEditable">
+                        <input [(ngModel)]="user.userName" #userName="ngModel" required name="userName" type="text" size="20" class="form-control col-xs-4">
+                        <div *ngIf="userName.errors && (userName.dirty || userName.touched)" class="error-block-custom">
+                         <div [hidden]="!userName.errors.required">
+                           UserName is required
+                         </div>
+                        </div> 
+                    </div>
+                    </div>
+                    <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{user.userName}}
+                    </div> 
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">User Enabled</label>
+                     <div *ngIf="isEditable">
+                     <div class="checkbox">
+                         <label style="padding-left: 4%;">
+                            <input [(ngModel)]="user.enabled" #enabled="ngModel" name="enabled" type="checkbox" class="">
+                         </label>
+                     </div>
+                     </div>
+                     <div class="Control-left-label col-sm-2" *ngIf="!isEditable">
+                            {{user.enabled}}
+                     </div>
+                </div>
+                <div class="form-group">
+                     <label class="control-label col-sm-2">Comp Users</label>
+                     <div class="Control-left-label col-sm-2" style="width:50%">
+                            <ul style="list-style-type:none; padding-left:1px " *ngFor="let compUser of compUserList ; let index =index">
+                                <li><a class="a-custom" *ngIf="isEditable" data-toggle="modal" data-target="#compUserModal" (click)="viewCompRole(compUser,index)" >{{compUser.compName}}</a>
+                                <label *ngIf="!isEditable">{{compUser.compName}}</label>
+                                <i *ngIf="isEditable" title="Remove component"  style="display: inline; color: red;padding-left:2px" class="glyphicon glyphicon-trash clickable" (click)="deleteCompRole(compUser)"></i>
+                                </li>
+                            </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                   <label class="control-label col-sm-2"></label>
+                   <div class="col-sm-10" *ngIf="isEditable">
+                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#compUserModal" (click)="addNewComp()">Add Component/Role</button>
+                 </div>
+                </div>  
+                 <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created By</label>
+                    <label class="control-label col-sm-2" style="text-align:left"> {{user.createdBy}}</label>                      
+                 </div>
+                  <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Created On</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{user.createdTime}}</label>                    
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated By</label> 
+                    <label class="control-label col-sm-2" style="text-align:left"> {{user.updatedBy}} </label> 
+                                      
+                 </div>
+              
+               <div class="form-group" *ngIf="!isEditable">
+                    <label class="control-label col-sm-2">Updated On</label>   
+                    <label class="control-label col-sm-2" style="text-align:left"> {{user.updatedTime}}</label>                  
+                 </div>
+            </fieldset>
+            <br>
+            <fieldset class="footer-fieldset">
+             <button [disabled]="!userForm.valid" type="submit" *ngIf="isUpdate" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="fa fa-floppy-o"></span>&nbsp;Save
+             </button>
+             <button type="button" *ngIf="isUpdate" class="btn btn-primary" (click)="resetForm()">
+                <span class="fa fa-undo"></span>&nbsp;Reset
+             </button>
+             <button [disabled]="!userForm.valid" *ngIf="isNew" class="btn btn-primary" style="margin-left:16.66%">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Create
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" style="margin-left:16.66%" (click)="editUser()">
+                <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+             </button>
+             <button type="button" class="btn btn-primary" *ngIf="!isEditable" (click)="removeUser()">
+                <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+             </button>
+             <dialog-message (onConfirm)="onConfirm($event)"></dialog-message>
+           </fieldset>
+    </fieldset>
+</form>
+<spinner [visible]="pageLoading"></spinner>
+<div id="compUserModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header modal-header-custom">
+                <button type="button" style="color:white" class="close" data-dismiss="modal"><b>&times;</b></button>
+                <h4 class="modal-title"><b>Add Component for User</b></h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id='myForm' #compUserForm="ngForm">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Component User</label>
+                        <div  class="col-sm-7">
+                            <select *ngIf="isEditable && !isCompUpdt" class="form-control" (change)="onChangeComp($event.target.value)">
+                                <option value="0" selected="{{('default' === selectedComp.compId) ? 'selected' : ''}}" >Select Component</option>
+                                <option [ngValue]="comp" *ngFor="let comp of componentList " selected="{{(comp.compId == selectedComp.compId) ? 'selected' : ''}}" >{{comp.name}} </option>
+                       	    </select>
+                               <label *ngIf="isEditable && isCompUpdt" class="control-left-label">{{compUser.compName}}</label>
+                        </div>
+                    </div>
+                    <div *ngIf="isCompUpdt" class="form-group">
+						<label class="control-label col-sm-4">Assigned Role</label>
+						<div class="col-sm-7">
+							<ul style="list-style-type: none; padding-left: 1px">
+								<li *ngFor="let compUserRole of addedRole ; let index =index"><label class="control-left-label" style="word-wrap:break-word;">{{compUserRole.role.authority}}</label>
+								<i title="Remove Role " style="display: inline; color: red; padding-left: 2px" class="glyphicon glyphicon-trash clickable" (click)="deleteRoleFromList(index)"></i></li>
+							</ul>
+						</div>
+					</div>
+                    <div class="form-group">
+						<label class="control-label col-sm-4">Non Assigned Role</label>
+						<div class="col-sm-7">
+							<select multiple="multiple" class="form-control" (change)="setSelectedRole($event.target)">
+								<option [ngValue]="role" [title]="role.authority" *ngFor="let role of roleListNA  ">{{role.authority}}</option>
+							</select>
+						</div>
+					</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button *ngIf="isEditable && !isCompUpdt" type="button" [disabled]='!compUserForm.valid' (click)="addNewCompRole()" data-dismiss="modal"
+                    class="btn btn-primary">Create</button>
+                <button *ngIf="isEditable && isCompUpdt" type="button"  (click)="updateCompRole()" data-dismiss="modal"
+                    class="btn btn-primary">Update</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+</span>

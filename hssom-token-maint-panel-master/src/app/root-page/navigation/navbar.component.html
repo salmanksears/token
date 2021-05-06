@@ -1,0 +1,25 @@
+
+ <span>
+ <div *ngIf="showNavBar">
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3 ppit-tab-menu">
+              <div class="list-group">
+                <a class="list-group-item active text-center" [routerLink]="['home']">
+                   <h4 class="glyphicon glyphicon-home"></h4><br/>Home
+                 </a>
+                 <a class="list-group-item active text-center" [routerLink]="['clients']">
+                  <h4 class="glyphicon glyphicon-user"></h4><br/>Clients
+                </a>
+                 <a class="list-group-item active text-center" [routerLink]="['roles']">
+                  <h4 class="glyphicon glyphicon-user"></h4><br/>Roles
+                </a>
+                 <a class="list-group-item active text-center" [routerLink]="['components']">
+                  <h4 class="glyphicon glyphicon-cloud"></h4><br/>Components
+                </a>
+                 <a class="list-group-item active text-center" [routerLink]="['users']">
+                  <h4 class="fa fa-users" aria-hidden="true"></h4><br/>Users
+                </a>
+              </div>
+            </div>
+  </div>
+ </span>
+  

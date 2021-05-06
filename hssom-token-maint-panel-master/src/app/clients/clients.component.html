@@ -1,0 +1,71 @@
+<span>
+  <responseMessage [visible]="displayMsg" [messageType]="messageType" [message] = "message"></responseMessage>
+  <span style="padding-right: 20px;"><h3 style="display:inline">Clients</h3></span >
+  <span ><button class="btn btn-primary" (click)="addNewClient()"><span class="fa fa-user-plus"></span>&nbsp;New
+Clients</button>
+	<span style="align:right">
+	  <span class="input-group pull-right">
+        <input class="form-control" placeholder="Search" type="search" [(ngModel)] = "searchCriteria" style="width:200px"/>
+      			  <span class="glyphicon glyphicon-search form-control-feedback"></span>
+	  </span>
+	</span>
+</span>
+<div class="margin-top-1 table-responsive" *ngIf="anyClient">
+	
+	<br/>
+	<div class="form-group">
+	   <div class="col-md-7">
+         <label class="control-label">Rows on page</label> 
+		   <select class="row-on-pages" [(ngModel)]="rowsOnPage">
+             <option [ngValue]="10">10</option>
+             <option [ngValue]="15">15</option>
+             <option [ngValue]="20">20</option>
+           </select>
+	   </div>
+	</div>
+	<table class="table table-bordered" [mfData]="clients" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage">
+		<thead>
+			<tr>
+				<th class="header-cell">
+					<mfDefaultSorter by="clientId">Client Id</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="clientCode">Client Code</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="clientSecret">Client Secret</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="enabled">Client Enabled</mfDefaultSorter>
+				</th>
+				<th class="header-cell">
+					<mfDefaultSorter by="tokenLife">Token Life</mfDefaultSorter>
+				</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<div *ngIf="(mf.data | clientSearchFilters : searchCriteria).length===0" >
+				No Result Found
+			</div>
+			<tr *ngFor="let client of mf.data | clientSearchFilters : searchCriteria : { clientResult : clients};  let index =index;let  isOdd=odd;let isEven=even"
+				[class.odd]="isOdd" [class.even]="isEven" [class.selected]="client.clientId===selectClientId" (click)="updateClient(client)"
+				(mouseover)='over(client)' (mouseout)=tableMouseOut()>
+				<td class="data-cell">{{ client.clientId }}</td>
+				<td class="data-cell">{{ client.clientCode }}</td>
+				<td class="data-cell">{{ client.clientSecret }}</td>
+				<td class="data-cell">{{ client.enabled }}</td>
+				<td class="data-cell">{{ client.tokenLife }}</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="9" align="right">
+					<mfBootstrapPaginator></mfBootstrapPaginator>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+<spinner [visible]="pageLoading"></spinner>
+</span>
